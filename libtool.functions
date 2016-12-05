@@ -1,0 +1,57 @@
+# This file is part of libertine linux's package libtool. It is subject to the license terms in the COPYRIGHT file found in the top-level directory of this distribution and at https://raw.githubusercontent.com/libertine-linux-packages/libtool/master/COPYRIGHT. No part of libertine linux's package libtool, including this file, may be copied, modified, propagated, or distributed except according to the terms contained in the COPYRIGHT file.
+# Copyright © 2016 The developers of libertine linux's package libtool. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/libertine-linux-packages/libtool/master/COPYRIGHT.
+
+
+variant=libtool-2.4.6
+
+depends build_busybox
+
+build_needs rm cp mkdir sed
+libertine_compile_build_libtool()
+{
+	local serial='4179'
+	local version='2.4.6'
+	
+	#libertine_public_autoconf_replaceWithKnownVersionOfBootstrap "$(libertine_public_sourcePath)"/bootstrap
+	#libertine_public_autoconf_replaceWithKnownVersionOfGnulib "$(libertine_public_sourcePath)"/gnulib
+	
+	rm -rf "$(libertine_public_sourcePath)"/bootstrap
+	rm -rf "$(libertine_public_sourcePath)"/gnulib
+	
+	# ltmain.sh
+	cp "$(libertine_public_packagePath)"/ltmain.sh "$(libertine_public_outputMiscPath)"
+	
+	# libtool m4 macros
+	local macrosOutputFolderPath="$(libertine_public_outputMiscPath)"/macros
+	mkdir -m 0755 -p "$macrosOutputFolderPath"
+	
+	pushd "$(libertine_public_sourcePath)"/m4
+		
+		cp lt~obsolete.m4 ltargz.m4 ltdl.m4 ltoptions.m4 ltsugar.m4 "$macrosOutputFolderPath"
+
+		# Note we don't try to sort out /usr/nec, /usr/local/lib, etc nonsense
+		sed \
+			-e 's;/usr/bin/file;file;g' \
+			-e 's;/usr/bin/objformat;objformat;g' \
+			-e 's;for lt_ac_sed in \$lt_ac_sed_list /usr/xpg4/bin/sed;for lt_ac_sed in sed;g' \
+			-e 's;for ac_dir in \$PATH /usr/ccs/bin/elf /usr/ccs/bin /usr/ucb /bin;for ac_dir in $PATH;g' \
+			-e 's;/usr/bin\$PATH_SEPARATOR\$PATH;$PATH;g' \
+			-e 's;/sbin/sysctl;sysctl;g' \
+			-e 's;/usr/sbin/sysctl;sysctl;g' \
+			-e 's;/sbin/sysconfig;sysconfig;g' \
+			-e 's;\$PATH:/sbin;$PATH;g' \
+			libtool.m4 >"$macrosOutputFolderPath"/libtool.m4
+		
+		sed \
+			-e 's;@MACRO_SERIAL@;'"$serial"';g' \
+			-e 's;@MACRO_VERSION@;'"$version"';g' \
+			-e 's;@MACRO_REVERSION@;'"$version"';g' \
+			ltversion.in >"$macrosOutputFolderPath"/ltversion.m4
+		
+	popd
+}
+
+libertine_compile_libtool()
+{
+	core_exitError 1 "Production installation of libtool is not supported yet"
+}
