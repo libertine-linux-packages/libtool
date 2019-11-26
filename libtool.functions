@@ -12,9 +12,6 @@ libertine_compile_build_libtool()
 	local serial='4179'
 	local version='2.4.6'
 	
-	#libertine_public_autoconf_replaceWithKnownVersionOfBootstrap "$(libertine_public_sourcePath)"/bootstrap
-	#libertine_public_autoconf_replaceWithKnownVersionOfGnulib "$(libertine_public_sourcePath)"/gnulib
-	
 	rm -rf "$(libertine_public_sourcePath)"/bootstrap
 	rm -rf "$(libertine_public_sourcePath)"/gnulib
 	
